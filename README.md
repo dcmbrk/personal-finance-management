@@ -2,76 +2,175 @@
 
 Ứng dụng quản lý chi tiêu cá nhân (bài tập lớn môn Lập trình Flutter).
 
-## Bài tập thực hành số 3
+## Bài tập thực hành số 4 - Thiết kế giao diện
 
-### Câu 1. static là gì? Cách sử dụng? Ưu nhược điểm
+### 1. Thống nhất thiết kế (Design System)
 
-**static là gì?**
+File `lib/AppTheme.dart` chứa toàn bộ quy ước dùng chung cho mọi màn hình.
 
-Trong Dart (và hầu hết các ngôn ngữ hướng đối tượng như Java, C#, C++), `static` là từ khóa dùng để khai báo một thành viên thuộc về chính lớp (class) chứ không thuộc về từng đối tượng (instance) được tạo ra từ lớp đó. Nghĩa là dù chương trình tạo ra bao nhiêu đối tượng đi nữa, thành viên `static` cũng chỉ tồn tại duy nhất một bản trong bộ nhớ và được tất cả các đối tượng dùng chung. Thành viên `static` được cấp phát ngay khi lớp được nạp vào bộ nhớ, tồn tại đến khi chương trình kết thúc, nên vòng đời của nó dài hơn vòng đời của một đối tượng thông thường. Dart hỗ trợ ba dạng: biến static (static field), phương thức static (static method) và hằng static (`static const`).
+**Màu sắc**
 
-**Cách sử dụng**
-
-Ta đặt từ khóa `static` trước khai báo biến hoặc phương thức bên trong lớp, ví dụ `static int count = 0;` hay `static double tinhTong(List<double> a) {...}`. Khi truy cập, ta gọi thông qua tên lớp chứ không qua đối tượng: `Transaction.count`, `Transaction.fromMap(...)`. Bên trong một phương thức `static` ta không được dùng `this`, cũng không truy cập trực tiếp được các biến instance, vì tại thời điểm đó có thể chưa tồn tại đối tượng nào. `static` thường được dùng cho: biến đếm số đối tượng đã tạo, hằng số cấu hình dùng chung (mã màu, tên bảng, khóa lưu trữ), các hàm tiện ích không phụ thuộc trạng thái đối tượng (định dạng tiền tệ, kiểm tra dữ liệu hợp lệ), hoặc mẫu thiết kế Singleton để giữ một thể hiện dùng chung toàn ứng dụng.
-
-**Ưu điểm**
-
-Tiết kiệm bộ nhớ vì chỉ có một bản duy nhất được cấp phát, không nhân lên theo số đối tượng. Truy cập nhanh và tiện lợi, không cần khởi tạo đối tượng mới. Cho phép chia sẻ dữ liệu và trạng thái chung giữa tất cả các đối tượng của lớp. Giúp nhóm các hàm tiện ích lại một chỗ, code rõ ràng và dễ tái sử dụng.
-
-**Nhược điểm**
-
-Vì là dữ liệu dùng chung nên `static` dễ tạo ra trạng thái toàn cục: một chỗ sửa thì mọi nơi khác bị ảnh hưởng, khó kiểm soát và khó tìm lỗi trong dự án lớn. Biến static tồn tại suốt vòng đời chương trình nên không được thu hồi bộ nhớ, dùng nhiều sẽ gây lãng phí hoặc rò rỉ bộ nhớ. Lớp lạm dụng static khó viết unit test và khó thay thế bằng đối tượng giả (mock). Phương thức static không tham gia được vào tính đa hình, không thể override theo lớp con nên làm giảm tính mở rộng của thiết kế hướng đối tượng. Ngoài ra trong môi trường đa luồng, biến static dùng chung có thể bị tranh chấp dữ liệu. Vì vậy chỉ nên dùng `static` cho hằng số, hàm tiện ích thuần túy và các trường hợp thật sự cần dùng chung.
-
-### Câu 2. Generics Class
-
-File: `lib/GenericBox.dart` — lớp tổng quát `GenericBox<T>` có một biến `obj` kiểu `T`, dùng để chứa và in ra danh sách sinh viên.
-
-```
-[{studentID: s123456, fullname: Nguyen Thi B}, {studentID: s345672, fullname: Nguyen Van D}, {studentID: s923333, fullname: Tran Thi  Van}]
-s123456 - Nguyen Thi B
-s345672 - Nguyen Van D
-s923333 - Tran Thi  Van
-```
-
-Chạy: `dart run lib/GenericBox.dart`
-
-### Câu 3. Lớp đối tượng của bài tập lớn
-
-File: `lib/Transaction.dart` — mô tả một giao dịch thu/chi trong ứng dụng quản lý tài chính cá nhân.
-
-Các biến:
-
-| Biến | Kiểu | Ý nghĩa |
+| Tên | Mã màu | Sử dụng |
 |---|---|---|
-| `id` | String | Mã giao dịch |
-| `title` | String | Tên giao dịch |
-| `amount` | double | Số tiền |
-| `category` | String | Danh mục (Ăn uống, Di chuyển, Lương...) |
-| `date` | DateTime | Ngày phát sinh |
-| `isExpense` | bool | true = chi, false = thu |
-| `note` | String | Ghi chú |
-| `count` | static int | Đếm số giao dịch đã tạo |
+| primary | `#2E7D32` | AppBar, nút, icon được chọn |
+| primaryLight | `#E8F5E9` | Nền chip danh mục, avatar |
+| accent | `#FFA000` | Nhấn mạnh |
+| background | `#F6F7F9` | Nền trang |
+| card | `#FFFFFF` | Nền thẻ |
+| textDark | `#1B1B1B` | Chữ chính |
+| textGrey | `#6B7280` | Chữ phụ |
+| expense | `#D32F2F` | Khoản chi |
+| income | `#2E7D32` | Khoản thu |
 
-Các phương thức: `signedAmount` (số tiền có dấu), `update()` (cập nhật thông tin), `toMap()` / `fromMap()` (chuyển đổi dữ liệu), `toString()` (hiển thị).
+**Font chữ:** Roboto — titleLarge 20 bold, titleMedium 16 w600, bodyMedium 14, bodySmall 12 (màu xám).
 
-### Câu 4. Danh sách và CRUD
+**Khoảng cách & bo góc:** padding 16, radius 12, card elevation 1.
 
-File: `lib/ListTransaction.dart` — có biến `items` là `List<Transaction>`.
+### 2. Mockup & Layout 3 màn hình
 
-- `create(Transaction t)`: thêm một giao dịch vào danh sách
-- `edit(String id, {...})`: sửa giao dịch theo id
-- `read()`: đọc và in toàn bộ giao dịch
-- `delete(String id)`: xóa giao dịch theo id
-- `findById(String id)`, `balance`: tìm kiếm và tính số dư
+```
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│   Trang chủ     │  │   Giao dịch     │  │   Giới thiệu    │
+├─────────────────┤  ├─────────────────┤  ├─────────────────┤
+│ ┌─────────────┐ │  │ (Tất cả)(Ăn..)  │  │       ◯         │
+│ │  Số dư      │ │  ├─────────────────┤  │ Personal Finance│
+│ │  5.630.000  │ │  │ ◯ Lương  +8.000 │  │   v1.0.0        │
+│ │ Thu ▲  Chi ▼│ │  │ ◯ Ăn uống -450  │  ├─────────────────┤
+│ └─────────────┘ │  │ ◯ Hóa đơn -120  │  │ Giới thiệu      │
+│ Ngân sách       │  │ ◯ Học tập -1.500│  │ [   mô tả    ]  │
+│ ▓▓▓▓▓░░░░ 47%   │  │ ◯ Xăng xe -300  │  │ Chức năng chính │
+│ Danh mục        │  │                 │  │ ✓ ...           │
+│ (Ăn)(Đi)(Mua)   │  │                 │  │ Thành viên nhóm │
+│ Giao dịch gần đây│ │                 │  │ ◯ Lê Duy Tùng   │
+│ ◯ ... -300.000  │  │                 │  │ ◯ Đỗ Công Minh  │
+├─────────────────┤  ├─────────────────┤  ├─────────────────┤
+│ 🏠   📄   ℹ️     │  │ 🏠   📄   ℹ️     │  │ 🏠   📄   ℹ️     │
+│Home Content About│ │Home Content About│ │Home Content About│
+└─────────────────┘  └─────────────────┘  └─────────────────┘
+```
 
-Chạy: `dart run lib/ListTransaction.dart`
+- **Home** (`lib/HomePage.dart`): thẻ số dư, tiến độ ngân sách, chip danh mục, giao dịch gần đây.
+- **Content** (`lib/ContentPage.dart`): danh sách toàn bộ giao dịch, lọc theo danh mục bằng ChoiceChip.
+- **About** (`lib/AboutPage.dart`): thông tin ứng dụng, chức năng chính, thành viên nhóm.
+
+### 3. Code chính phần Layout
+
+```dart
+Scaffold(
+  appBar: AppBar(title: const Text('Trang chủ')),
+  body: SingleChildScrollView(
+    padding: const EdgeInsets.all(AppTheme.padding),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppTheme.primary,
+            borderRadius: BorderRadius.circular(AppTheme.radius),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Số dư hiện tại'),
+              Text(AppData.money(AppData.transactions.balance)),
+              Row(children: [Expanded(child: _Summary(...)), Expanded(child: _Summary(...))]),
+            ],
+          ),
+        ),
+        LinearProgressIndicator(value: percent),
+        SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: chips)),
+        ...recent.map((t) => Card(child: ListTile(...))),
+      ],
+    ),
+  ),
+)
+```
+
+### 4. Code chính của Navigation Bar
+
+File `lib/MainScreen.dart`:
+
+```dart
+class _MainScreenState extends State<MainScreen> {
+  int currentIndex = 0;
+
+  final List<Widget> pages = const [HomePage(), ContentPage(), AboutPage()];
+
+  void onTap(int index) {
+    setState(() => currentIndex = index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(index: currentIndex, children: pages),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: onTap,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            activeIcon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long_outlined),
+            activeIcon: Icon(Icons.receipt_long),
+            label: 'Content',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info_outline),
+            activeIcon: Icon(Icons.info),
+            label: 'About',
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+Cấu hình dùng chung trong `AppTheme`:
+
+```dart
+bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+  backgroundColor: Colors.white,
+  selectedItemColor: primary,
+  unselectedItemColor: textGrey,
+  type: BottomNavigationBarType.fixed,
+  showUnselectedLabels: true,
+),
+```
+
+`IndexedStack` giữ nguyên trạng thái của từng trang khi chuyển tab.
+
+### 5. Ảnh chụp màn hình
+
+| Home | Content | About |
+|---|---|---|
+| ![Home](screenshots/home.png) | ![Content](screenshots/content.png) | ![About](screenshots/about.png) |
 
 ## Cấu trúc thư mục
 
 ```
 lib/
 ├── main.dart
+├── AppTheme.dart
+├── AppData.dart
+├── MainScreen.dart
+├── HomePage.dart
+├── ContentPage.dart
+├── AboutPage.dart
 ├── GenericBox.dart
 ├── Transaction.dart
 └── ListTransaction.dart
+```
+
+## Chạy ứng dụng
+
+```
+flutter pub get
+flutter run
 ```
