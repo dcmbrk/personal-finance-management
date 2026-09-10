@@ -1,0 +1,44 @@
+{
+  "name": "personal_finance - Flutter Dev",
+
+  // Image đã cài sẵn Flutter SDK + Android SDK + Java.
+  // Pin đúng version nhóm đang dùng để mọi máy cá nhân chạy giống nhau.
+  "image": "ghcr.io/cirruslabs/flutter:3.47.1",
+
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Dart-Code.dart-code",
+        "Dart-Code.flutter",
+        "usernamehw.errorlens"
+      ],
+      "settings": {
+        "dart.flutterSdkPath": "/sdks/flutter",
+        "dart.lineLength": 80,
+        "editor.formatOnSave": true,
+        "editor.rulers": [80],
+        "files.eol": "\n",
+        "[dart]": {
+          "editor.defaultFormatter": "Dart-Code.dart-code",
+          "editor.codeActionsOnSave": { "source.fixAll": "explicit" }
+        }
+      }
+    }
+  },
+
+  // 8080: flutter run -d web-server ; 9100: DevTools
+  "forwardPorts": [8080, 9100],
+  "portsAttributes": {
+    "8080": { "label": "Flutter Web", "onAutoForward": "openPreview" },
+    "9100": { "label": "Dart DevTools" }
+  },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "remoteUser": "root"
+}

@@ -46,3 +46,15 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Node / tooling phụ trợ - KHÔNG commit lên repo chung
+node_modules/
+npm-debug.log*
+yarn-error.log
+package-lock.json.bak
+
+# Devcontainer / môi trường cá nhân
+.devcontainer/*.local.json
+android/local.properties
+*.env
+.env.local
