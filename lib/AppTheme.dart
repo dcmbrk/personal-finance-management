@@ -8,6 +8,7 @@ class AppTheme {
   static const Color card = Colors.white;
   static const Color textDark = Color(0xFF1B1B1B);
   static const Color textGrey = Color(0xFF6B7280);
+  static const Color border = Color(0xFFD0D5DD);
   static const Color expense = Color(0xFFD32F2F);
   static const Color income = Color(0xFF2E7D32);
 
@@ -29,7 +30,7 @@ class AppTheme {
         elevation: 0,
         titleTextStyle: TextStyle(
           fontFamily: fontFamily,
-          fontSize: 20,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -62,6 +63,8 @@ class AppTheme {
         unselectedItemColor: textGrey,
         type: BottomNavigationBarType.fixed,
         showUnselectedLabels: true,
+        selectedLabelStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+        unselectedLabelStyle: TextStyle(fontSize: 11),
       ),
     );
   }
