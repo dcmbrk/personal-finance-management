@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'AppTheme.dart';
 import 'HomePage.dart';
 import 'ContentPage.dart';
-import 'AboutPage.dart';
+import 'StatisticsPage.dart';
+import 'SettingsPage.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -13,39 +15,45 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
 
-  final List<Widget> pages = const [
-    HomePage(),
-    ContentPage(),
-    AboutPage(),
-  ];
-
   void onTap(int index) {
     setState(() => currentIndex = index);
   }
 
+  BottomNavigationBarItem navItem(IconData icon, IconData activeIcon, String label) {
+    return BottomNavigationBarItem(
+      icon: SizedBox(width: 60, height: 28, child: Icon(icon, size: 21)),
+      activeIcon: Container(
+        width: 60,
+        height: 28,
+        decoration: BoxDecoration(
+          color: AppTheme.primaryLight,
+          borderRadius: BorderRadius.circular(99),
+        ),
+        child: Icon(activeIcon, size: 21),
+      ),
+      label: label,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      HomePage(onSeeAll: () => onTap(1)),
+      const ContentPage(),
+      const StatisticsPage(),
+      const SettingsPage(),
+    ];
+
     return Scaffold(
       body: IndexedStack(index: currentIndex, children: pages),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: onTap,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_outlined),
-            activeIcon: Icon(Icons.receipt_long),
-            label: 'Content',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info_outline),
-            activeIcon: Icon(Icons.info),
-            label: 'About',
-          ),
+        items: [
+          navItem(Icons.home_outlined, Icons.home, 'Trang chủ'),
+          navItem(Icons.receipt_long_outlined, Icons.receipt_long, 'Giao dịch'),
+          navItem(Icons.bar_chart_outlined, Icons.bar_chart, 'Thống kê'),
+          navItem(Icons.settings_outlined, Icons.settings, 'Cài đặt'),
         ],
       ),
     );

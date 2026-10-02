@@ -68,13 +68,15 @@ class AppData {
     return sum;
   }
 
-  static String money(double value) {
+  static String number(double value) {
     final s = value.toStringAsFixed(0);
     final buffer = StringBuffer();
     for (int i = 0; i < s.length; i++) {
       if (i > 0 && (s.length - i) % 3 == 0) buffer.write('.');
       buffer.write(s[i]);
     }
-    return '${buffer.toString()} $currency';
+    return buffer.toString();
   }
+
+  static String money(double value) => '${number(value)} $currency';
 }
