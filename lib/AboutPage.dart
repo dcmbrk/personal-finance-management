@@ -7,6 +7,7 @@ class AboutPage extends StatelessWidget {
   static const List<Map<String, String>> members = [
     {'name': 'Lê Duy Tùng', 'id': '23010287'},
     {'name': 'Đỗ Công Minh', 'id': '24100036'},
+    {'name': 'Lưu Quang Trung', 'id': '20010992'},
   ];
 
   static const List<String> features = [
