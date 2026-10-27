@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'AppTheme.dart';
+import 'app_theme.dart';
 
 class StatisticsPage extends StatelessWidget {
   const StatisticsPage({super.key});

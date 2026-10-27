@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'AppTheme.dart';
-import 'MainScreen.dart';
+import 'app_theme.dart';
+import 'app_data.dart';
+import 'main_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppData.instance.load();
   runApp(const MyApp());
 }
 

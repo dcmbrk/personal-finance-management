@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class GenericBox<T> {
   T obj;
 
@@ -10,7 +12,7 @@ class GenericBox<T> {
   }
 
   void show() {
-    print(obj);
+    debugPrint('$obj');
   }
 }
 
@@ -25,6 +27,6 @@ void main() {
   box.show();
 
   for (var s in box.obj) {
-    print('${s['studentID']} - ${s['fullname']}');
+    debugPrint('${s['studentID']} - ${s['fullname']}');
   }
 }

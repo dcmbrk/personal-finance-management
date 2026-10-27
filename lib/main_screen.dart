@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'AppTheme.dart';
-import 'HomePage.dart';
-import 'ContentPage.dart';
-import 'StatisticsPage.dart';
-import 'SettingsPage.dart';
+import 'app_theme.dart';
+import 'app_data.dart';
+import 'home_page.dart';
+import 'content_page.dart';
+import 'statistics_page.dart';
+import 'settings_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,6 +18,16 @@ class _MainScreenState extends State<MainScreen> {
 
   void onTap(int index) {
     setState(() => currentIndex = index);
+  }
+
+  void openCategory(String category) {
+    AppData.instance.categoryFilter.value = category;
+    onTap(1);
+  }
+
+  void openAllTransactions() {
+    AppData.instance.categoryFilter.value = AppData.allCategories;
+    onTap(1);
   }
 
   BottomNavigationBarItem navItem(IconData icon, IconData activeIcon, String label) {
@@ -38,7 +49,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      HomePage(onSeeAll: () => onTap(1)),
+      HomePage(onSeeAll: openAllTransactions, onCategoryTap: openCategory),
       const ContentPage(),
       const StatisticsPage(),
       const SettingsPage(),

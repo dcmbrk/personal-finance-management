@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'AppTheme.dart';
-import 'AppData.dart';
-import 'Transaction.dart';
+import 'app_theme.dart';
+import 'app_data.dart';
+import 'transaction.dart';
 
 class ContentPage extends StatefulWidget {
   const ContentPage({super.key});
@@ -11,21 +11,25 @@ class ContentPage extends StatefulWidget {
 }
 
 class _ContentPageState extends State<ContentPage> {
-  String filter = 'Tất cả';
+  String get filter => AppData.instance.categoryFilter.value;
 
   List<Transaction> get data {
     final items = AppData.transactions.items;
-    if (filter == 'Tất cả') return items;
+    if (filter == AppData.allCategories) return items;
     return items.where((t) => t.category == filter).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final filters = ['Tất cả', ...AppData.categories];
+    final filters = [AppData.allCategories, ...AppData.categories];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Giao dịch')),
-      body: Column(
+      body: ListenableBuilder(
+        listenable: Listenable.merge(
+          [AppData.instance, AppData.instance.categoryFilter],
+        ),
+        builder: (context, _) => Column(
         children: [
           Container(
             color: Colors.white,
@@ -47,7 +51,7 @@ class _ContentPageState extends State<ContentPage> {
                         color: selected ? Colors.white : AppTheme.primary,
                         fontWeight: FontWeight.w500,
                       ),
-                      onSelected: (_) => setState(() => filter = f),
+                      onSelected: (_) => AppData.instance.categoryFilter.value = f,
                     ),
                   );
                 }).toList(),
@@ -95,6 +99,7 @@ class _ContentPageState extends State<ContentPage> {
                   ),
           ),
         ],
+      ),
       ),
     );
   }

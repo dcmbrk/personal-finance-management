@@ -1,4 +1,6 @@
-import 'Transaction.dart';
+import 'package:flutter/foundation.dart';
+
+import 'transaction.dart';
 
 class ListTransaction {
   List<Transaction> items = [];
@@ -34,7 +36,7 @@ class ListTransaction {
 
   void read() {
     for (var t in items) {
-      print(t);
+      debugPrint('$t');
     }
   }
 
@@ -89,9 +91,9 @@ void main() {
   list.read();
 
   list.edit('t003', amount: 80000, note: 'Do day binh');
-  print(list.findById('t003'));
+  debugPrint('${list.findById('t003')}');
 
   list.read();
-  print('So du: ${list.balance}');
-  print('Tong so ban ghi da tao: ${Transaction.count}');
+  debugPrint('So du: ${list.balance}');
+  debugPrint('Tong so ban ghi da tao: ${Transaction.count}');
 }

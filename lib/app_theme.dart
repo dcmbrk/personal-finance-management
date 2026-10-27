@@ -11,6 +11,10 @@ class AppTheme {
   static const Color border = Color(0xFFD0D5DD);
   static const Color expense = Color(0xFFD32F2F);
   static const Color income = Color(0xFF2E7D32);
+  static const Color expenseLight = Color(0xFFFDECEA);
+  static const Color warning = Color(0xFFB45309);
+  static const Color warningBar = Color(0xFFF59E0B);
+  static const Color warningLight = Color(0xFFFEF3C7);
 
   static const String fontFamily = 'Roboto';
 
