@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'app_theme.dart';
 
 class AboutPage extends StatelessWidget {
@@ -70,20 +71,29 @@ class AboutPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Text('Chức năng chính', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Chức năng chính',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Card(
               child: Column(
                 children: features.map((f) {
                   return ListTile(
-                    leading: const Icon(Icons.check_circle, color: AppTheme.primary),
+                    leading: const Icon(
+                      Icons.check_circle,
+                      color: AppTheme.primary,
+                    ),
                     title: Text(f),
                   );
                 }).toList(),
               ),
             ),
             const SizedBox(height: 20),
-            Text('Thành viên nhóm', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Thành viên nhóm',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Card(
               child: Column(

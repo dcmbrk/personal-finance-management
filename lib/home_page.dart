@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'app_theme.dart';
 import 'app_data.dart';
 import 'transaction.dart';
@@ -10,7 +11,10 @@ class HomePage extends StatelessWidget {
   const HomePage({super.key, this.onSeeAll, this.onCategoryTap});
 
   static const double cardRadius = 11;
-  static const BorderSide cardBorder = BorderSide(color: AppTheme.border, width: 1.2);
+  static const BorderSide cardBorder = BorderSide(
+    color: AppTheme.border,
+    width: 1.2,
+  );
 
   static const TextStyle sectionTitle = TextStyle(
     fontSize: 14,
@@ -45,7 +49,10 @@ class HomePage extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Ngân sách tháng ${now.month}/${now.year}', style: sectionTitle),
+            Text(
+              'Ngân sách tháng ${now.month}/${now.year}',
+              style: sectionTitle,
+            ),
             Text(
               'Còn ${_daysLeft(now)} ngày',
               style: const TextStyle(fontSize: 12, color: AppTheme.textGrey),
@@ -202,26 +209,30 @@ class HomePage extends StatelessWidget {
     final ratio = data.budgetRatio(now);
     final status = data.budgetStatus(now);
 
-    final (Color textColor, Color barColor, Color alertBg, String? alert) =
-        switch (status) {
+    final (
+      Color textColor,
+      Color barColor,
+      Color alertBg,
+      String? alert,
+    ) = switch (status) {
       BudgetStatus.over => (
-          AppTheme.expense,
-          AppTheme.expense,
-          AppTheme.expenseLight,
-          'Đã vượt ngân sách ${AppData.money(spent - budget)}',
-        ),
+        AppTheme.expense,
+        AppTheme.expense,
+        AppTheme.expenseLight,
+        'Đã vượt ngân sách ${AppData.money(spent - budget)}',
+      ),
       BudgetStatus.warning => (
-          AppTheme.warning,
-          AppTheme.warningBar,
-          AppTheme.warningLight,
-          'Sắp chạm ngân sách, còn ${AppData.money(budget - spent)}',
-        ),
+        AppTheme.warning,
+        AppTheme.warningBar,
+        AppTheme.warningLight,
+        'Sắp chạm ngân sách, còn ${AppData.money(budget - spent)}',
+      ),
       BudgetStatus.normal => (
-          AppTheme.primary,
-          AppTheme.primary,
-          Colors.transparent,
-          null,
-        ),
+        AppTheme.primary,
+        AppTheme.primary,
+        Colors.transparent,
+        null,
+      ),
     };
 
     return Container(
@@ -241,7 +252,10 @@ class HomePage extends StatelessWidget {
                 child: Text(
                   '${AppData.money(spent)} / ${AppData.money(budget)}',
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12, color: AppTheme.textGrey),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.textGrey,
+                  ),
                 ),
               ),
               Text(
@@ -317,7 +331,10 @@ class HomePage extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Text(
                     c,
-                    style: const TextStyle(fontSize: 12, color: AppTheme.primary),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.primary,
+                    ),
                   ),
                 ),
               ),
@@ -354,12 +371,19 @@ class _Summary extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, size: 22, color: color),
-          Text('$label ', style: const TextStyle(fontSize: 11, color: AppTheme.textGrey)),
+          Text(
+            '$label ',
+            style: const TextStyle(fontSize: 11, color: AppTheme.textGrey),
+          ),
           Expanded(
             child: Text(
               value,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
             ),
           ),
         ],
@@ -389,8 +413,14 @@ class _TransactionCard extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 16.5,
-            backgroundColor: t.isExpense ? AppTheme.expenseLight : AppTheme.primaryLight,
-            child: Icon(t.isExpense ? Icons.remove : Icons.add, size: 18, color: color),
+            backgroundColor: t.isExpense
+                ? AppTheme.expenseLight
+                : AppTheme.primaryLight,
+            child: Icon(
+              t.isExpense ? Icons.remove : Icons.add,
+              size: 18,
+              color: color,
+            ),
           ),
           const SizedBox(width: 7),
           Expanded(
@@ -402,19 +432,29 @@ class _TransactionCard extends StatelessWidget {
                   t.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, color: AppTheme.textDark),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppTheme.textDark,
+                  ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   '${t.category} · ${t.date.day}/${t.date.month}/${t.date.year}',
-                  style: const TextStyle(fontSize: 11, color: AppTheme.textGrey),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppTheme.textGrey,
+                  ),
                 ),
               ],
             ),
           ),
           Text(
             '${t.isExpense ? '-' : '+'}${AppData.number(t.amount)}',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
           ),
         ],
       ),

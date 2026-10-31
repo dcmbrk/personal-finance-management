@@ -28,9 +28,11 @@ class ListTransaction {
           isExpense: isExpense,
           note: note,
         );
+
         return true;
       }
     }
+
     return false;
   }
 
@@ -42,58 +44,29 @@ class ListTransaction {
 
   Transaction? findById(String id) {
     for (var t in items) {
-      if (t.id == id) return t;
+      if (t.id == id) {
+        return t;
+      }
     }
+
     return null;
   }
 
   bool delete(String id) {
     final before = items.length;
+
     items.removeWhere((t) => t.id == id);
+
     return items.length < before;
   }
 
   double get balance {
     double sum = 0;
+
     for (var t in items) {
       sum += t.signedAmount;
     }
+
     return sum;
   }
-}
-
-void main() {
-  var list = ListTransaction();
-
-  list.create(Transaction(
-    id: 't001',
-    title: 'An trua',
-    amount: 45000,
-    category: 'An uong',
-    date: DateTime(2025, 9, 10),
-  ));
-  list.create(Transaction(
-    id: 't002',
-    title: 'Luong thang 9',
-    amount: 8000000,
-    category: 'Luong',
-    date: DateTime(2025, 9, 5),
-    isExpense: false,
-  ));
-  list.create(Transaction(
-    id: 't003',
-    title: 'Do xang',
-    amount: 60000,
-    category: 'Di chuyen',
-    date: DateTime(2025, 9, 8),
-  ));
-
-  list.read();
-
-  list.edit('t003', amount: 80000, note: 'Do day binh');
-  debugPrint('${list.findById('t003')}');
-
-  list.read();
-  debugPrint('So du: ${list.balance}');
-  debugPrint('Tong so ban ghi da tao: ${Transaction.count}');
 }
