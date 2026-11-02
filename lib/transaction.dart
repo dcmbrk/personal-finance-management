@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Transaction {
   static int count = 0;
 
@@ -45,21 +47,35 @@ class Transaction {
       'title': title,
       'amount': amount,
       'category': category,
-      'date': date.toIso8601String(),
+      'date': Timestamp.fromDate(date),
       'isExpense': isExpense,
       'note': note,
     };
   }
 
   factory Transaction.fromMap(Map<String, dynamic> map) {
+    final rawDate = map['date'];
+
+    DateTime parsedDate;
+
+    if (rawDate is Timestamp) {
+      parsedDate = rawDate.toDate();
+    } else if (rawDate is DateTime) {
+      parsedDate = rawDate;
+    } else if (rawDate is String) {
+      parsedDate = DateTime.parse(rawDate);
+    } else {
+      throw FormatException('Ngày giao dịch không hợp lệ: $rawDate');
+    }
+
     return Transaction(
-      id: map['id'],
-      title: map['title'],
+      id: map['id'] as String,
+      title: map['title'] as String,
       amount: (map['amount'] as num).toDouble(),
-      category: map['category'],
-      date: DateTime.parse(map['date']),
-      isExpense: map['isExpense'] ?? true,
-      note: map['note'] ?? '',
+      category: map['category'] as String,
+      date: parsedDate,
+      isExpense: map['isExpense'] as bool? ?? true,
+      note: map['note'] as String? ?? '',
     );
   }
 
@@ -67,6 +83,7 @@ class Transaction {
   String toString() {
     final type = isExpense ? 'Chi' : 'Thu';
     final d = '${date.day}/${date.month}/${date.year}';
+
     return '[$id] $d | $type | $title | $category | $amount | $note';
   }
 }

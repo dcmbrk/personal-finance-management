@@ -67,7 +67,10 @@ class AppTheme {
         unselectedItemColor: textGrey,
         type: BottomNavigationBarType.fixed,
         showUnselectedLabels: true,
-        selectedLabelStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+        selectedLabelStyle: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
         unselectedLabelStyle: TextStyle(fontSize: 11),
       ),
     );

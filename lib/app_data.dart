@@ -1,10 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'transaction.dart';
 import 'list_transaction.dart';
+import 'services/transaction_repository.dart';
 
 class AppData extends ChangeNotifier {
   AppData._();
@@ -35,66 +33,84 @@ class AppData extends ChangeNotifier {
 
   static const List<String> categories = expenseCategories;
 
-  static const String _keyTransactions = 'transactions';
-  static const String _keyOwner = 'owner';
-  static const String _keyBudget = 'monthlyBudget';
-
   final ListTransaction _list = ListTransaction();
+
   String _owner = defaultOwner;
   double _budget = defaultBudget;
-  SharedPreferences? _prefs;
 
   final ValueNotifier<String> categoryFilter = ValueNotifier(allCategories);
 
   static ListTransaction get transactions => instance._list;
 
   List<Transaction> get items => List.unmodifiable(_list.items);
+
   String get owner => _owner;
+
   double get monthlyBudget => _budget;
 
+  // Tải hồ sơ và giao dịch từ Firestore.
   Future<void> load() async {
-    _prefs = await SharedPreferences.getInstance();
-    final prefs = _prefs!;
+    final repository = TransactionRepository.instance;
 
-    _owner = prefs.getString(_keyOwner) ?? defaultOwner;
-    _budget = prefs.getDouble(_keyBudget) ?? defaultBudget;
+    final userData = await repository.loadUserData();
 
-    final raw = prefs.getString(_keyTransactions);
-    _list.items = raw == null ? sampleTransactions() : _decode(raw);
-    notifyListeners();
-  }
+    _owner = userData['owner'] as String? ?? defaultOwner;
 
-  List<Transaction> _decode(String raw) {
-    try {
-      final data = jsonDecode(raw) as List;
-      return data
-          .map((e) => Transaction.fromMap(Map<String, dynamic>.from(e)))
-          .toList();
-    } catch (_) {
-      return sampleTransactions();
+    _budget = (userData['monthlyBudget'] as num?)?.toDouble() ?? defaultBudget;
+
+    final isNewUser = userData['_isNewUser'] == true;
+
+    List<Transaction> loadedTransactions = await repository.loadTransactions();
+
+    // Chỉ tạo dữ liệu mẫu khi tài khoản chưa có hồ sơ.
+    if (isNewUser) {
+      loadedTransactions = sampleTransactions();
+
+      await repository.replaceTransactions(loadedTransactions);
     }
+
+    _list.items = loadedTransactions;
+
+    notifyListeners();
   }
 
   void _changed() {
     notifyListeners();
-    final prefs = _prefs;
-    if (prefs == null) return;
-    prefs.setString(
-      _keyTransactions,
-      jsonEncode(_list.items.map((t) => t.toMap()).toList()),
-    );
-    prefs.setString(_keyOwner, _owner);
-    prefs.setDouble(_keyBudget, _budget);
   }
 
-  String newId() => 't${DateTime.now().microsecondsSinceEpoch}';
+  // Tạo ID giao dịch theo thứ tự: t001, t002, t003...
+  // Dựa trên các ID hiện có để tránh trùng với dữ liệu đã tải.
+  String newId() {
+    int maxId = 0;
 
-  void add(Transaction t) {
+    for (final transaction in _list.items) {
+      final match = RegExp(r'^t(\d+)$').firstMatch(transaction.id);
+
+      if (match != null) {
+        final number = int.tryParse(match.group(1) ?? '');
+
+        if (number != null && number > maxId) {
+          maxId = number;
+        }
+      }
+    }
+
+    final nextId = maxId + 1;
+
+    return 't${nextId.toString().padLeft(3, '0')}';
+  }
+
+  // Thêm giao dịch.
+  Future<void> add(Transaction t) async {
+    await TransactionRepository.instance.addTransaction(t);
+
     _list.create(t);
+
     _changed();
   }
 
-  bool update(
+  // Cập nhật giao dịch.
+  Future<bool> update(
     String id, {
     String? title,
     double? amount,
@@ -102,7 +118,23 @@ class AppData extends ChangeNotifier {
     DateTime? date,
     bool? isExpense,
     String? note,
-  }) {
+  }) async {
+    final current = _list.findById(id);
+
+    if (current == null) return false;
+
+    final updatedTransaction = Transaction(
+      id: current.id,
+      title: title ?? current.title,
+      amount: amount ?? current.amount,
+      category: category ?? current.category,
+      date: date ?? current.date,
+      isExpense: isExpense ?? current.isExpense,
+      note: note ?? current.note,
+    );
+
+    await TransactionRepository.instance.updateTransaction(updatedTransaction);
+
     final ok = _list.edit(
       id,
       title: title,
@@ -112,13 +144,28 @@ class AppData extends ChangeNotifier {
       isExpense: isExpense,
       note: note,
     );
-    if (ok) _changed();
+
+    if (ok) {
+      _changed();
+    }
+
     return ok;
   }
 
-  bool remove(String id) {
+  // Xóa giao dịch.
+  Future<bool> remove(String id) async {
+    final current = _list.findById(id);
+
+    if (current == null) return false;
+
+    await TransactionRepository.instance.deleteTransaction(id);
+
     final ok = _list.delete(id);
-    if (ok) _changed();
+
+    if (ok) {
+      _changed();
+    }
+
     return ok;
   }
 
@@ -126,6 +173,7 @@ class AppData extends ChangeNotifier {
 
   List<Transaction> recent([int count = 4]) {
     final sorted = [..._list.items]..sort((a, b) => b.date.compareTo(a.date));
+
     return sorted.take(count).toList();
   }
 
@@ -137,27 +185,33 @@ class AppData extends ChangeNotifier {
 
   double incomeOf(DateTime month) {
     double sum = 0;
+
     for (var t in inMonth(month)) {
       if (!t.isExpense) sum += t.amount;
     }
+
     return sum;
   }
 
   double expenseOf(DateTime month) {
     double sum = 0;
+
     for (var t in inMonth(month)) {
       if (t.isExpense) sum += t.amount;
     }
+
     return sum;
   }
 
   Map<String, double> expenseByCategory(DateTime month) {
     final result = <String, double>{};
+
     for (var t in inMonth(month)) {
       if (t.isExpense) {
         result[t.category] = (result[t.category] ?? 0) + t.amount;
       }
     }
+
     return result;
   }
 
@@ -168,38 +222,68 @@ class AppData extends ChangeNotifier {
 
   BudgetStatus budgetStatus(DateTime month) {
     final ratio = budgetRatio(month);
+
     if (ratio > 1) return BudgetStatus.over;
     if (ratio >= warningRatio) return BudgetStatus.warning;
+
     return BudgetStatus.normal;
   }
 
-  void setOwner(String name) {
+  // Cập nhật tên người dùng.
+  Future<void> setOwner(String name) async {
     final value = name.trim();
+
     if (value.isEmpty) return;
+
+    await TransactionRepository.instance.updateUserData(owner: value);
+
     _owner = value;
+
     _changed();
   }
 
-  void setBudget(double value) {
+  // Cập nhật ngân sách.
+  Future<void> setBudget(double value) async {
     if (value <= 0) return;
+
+    await TransactionRepository.instance.updateUserData(monthlyBudget: value);
+
     _budget = value;
+
     _changed();
   }
 
-  void resetSampleData() {
-    _list.items = sampleTransactions();
+  // Khôi phục dữ liệu mẫu.
+  Future<void> resetSampleData() async {
+    final sampleData = sampleTransactions();
+
+    await TransactionRepository.instance.replaceTransactions(sampleData);
+
+    await TransactionRepository.instance.updateUserData(
+      owner: defaultOwner,
+      monthlyBudget: defaultBudget,
+    );
+
+    _list.items = sampleData;
     _owner = defaultOwner;
     _budget = defaultBudget;
+
     _changed();
   }
 
-  void clearAll() {
+  // Xóa toàn bộ giao dịch.
+  Future<void> clearAll() async {
+    await TransactionRepository.instance.clearTransactions();
+
     _list.items = [];
+
     _changed();
   }
 
+  // Năm giao dịch mẫu ban đầu.
   static List<Transaction> sampleTransactions([DateTime? now]) {
     final n = now ?? DateTime.now();
+
     DateTime day(int d) => DateTime(n.year, n.month, d > n.day ? n.day : d);
 
     return [
@@ -246,10 +330,15 @@ class AppData extends ChangeNotifier {
     final negative = value < 0;
     final s = value.abs().toStringAsFixed(0);
     final buffer = StringBuffer();
+
     for (int i = 0; i < s.length; i++) {
-      if (i > 0 && (s.length - i) % 3 == 0) buffer.write('.');
+      if (i > 0 && (s.length - i) % 3 == 0) {
+        buffer.write('.');
+      }
+
       buffer.write(s[i]);
     }
+
     return negative ? '-$buffer' : buffer.toString();
   }
 
@@ -257,7 +346,9 @@ class AppData extends ChangeNotifier {
 
   static double? parseMoney(String input) {
     final digits = input.replaceAll(RegExp(r'[^0-9]'), '');
+
     if (digits.isEmpty) return null;
+
     return double.tryParse(digits);
   }
 }

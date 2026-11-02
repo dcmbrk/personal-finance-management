@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'app_theme.dart';
 import 'app_data.dart';
 import 'home_page.dart';
@@ -30,7 +31,11 @@ class _MainScreenState extends State<MainScreen> {
     onTap(1);
   }
 
-  BottomNavigationBarItem navItem(IconData icon, IconData activeIcon, String label) {
+  BottomNavigationBarItem navItem(
+    IconData icon,
+    IconData activeIcon,
+    String label,
+  ) {
     return BottomNavigationBarItem(
       icon: SizedBox(width: 60, height: 28, child: Icon(icon, size: 21)),
       activeIcon: Container(
